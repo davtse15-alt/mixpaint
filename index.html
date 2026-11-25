@@ -12,6 +12,8 @@
       --panel: #ffffff;
       --ink: #2b2d42;
       --gold: #ffb703;
+      --aqua: #38bdf8;
+      --mint: #22c55e;
     }
 
     * {
@@ -52,6 +54,7 @@
       display: flex;
       gap: 8px;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     button {
@@ -64,7 +67,7 @@
       background: #edf2f4;
       color: var(--ink);
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-      transition: transform 0.12s ease, background 0.2s ease;
+      transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -79,6 +82,11 @@
       color: #1d1e2c;
     }
 
+    button.active-water {
+      background: linear-gradient(135deg, #bae6fd, #7dd3fc);
+      color: #0c4a6e;
+    }
+
     /* Main Workspace */
     .studio {
       flex: 1;
@@ -86,6 +94,7 @@
       padding: 12px;
       gap: 12px;
       overflow: hidden;
+      min-height: 0;
     }
 
     /* Left Mixing Station */
@@ -101,6 +110,8 @@
       justify-content: space-between;
       align-items: center;
       z-index: 10;
+      transition: flex 0.28s ease, padding 0.28s ease;
+      overflow-y: auto;
     }
 
     .station-title {
@@ -110,12 +121,55 @@
       color: #4a4e69;
     }
 
+    .station-subtitle {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #64748b;
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    /* Mode-specific sections inside left station */
+    .free-lab-controls {
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .watercolor-controls {
+      width: 100%;
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    body.water-mode .free-lab-controls {
+      display: none;
+    }
+
+    body.water-mode .watercolor-controls {
+      display: flex;
+    }
+
+    body.water-mode .mixing-station {
+      background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);
+      border: 2px solid #bae6fd;
+    }
+
     /* Primary Paint Tubes / Blobs */
     .paint-wells {
       display: flex;
       justify-content: center;
-      gap: 10px;
+      gap: 14px;
       flex-wrap: wrap;
+      padding-bottom: 14px;
     }
 
     .paint-blob {
@@ -126,7 +180,7 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 -4px 8px rgba(0, 0, 0, 0.18);
       cursor: pointer;
       position: relative;
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .paint-blob:active {
@@ -135,22 +189,35 @@
 
     .paint-blob span {
       position: absolute;
-      bottom: -18px;
+      bottom: -20px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       font-weight: 800;
       color: #4a4e69;
       white-space: nowrap;
     }
 
     /* Center Mixing Bowl */
+    .comparison-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .lab-goal-wrapper,
+    .lab-match-badge {
+      display: none;
+    }
+
     .bowl-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 8px;
-      margin-top: 8px;
+      margin-top: 4px;
     }
 
     .mixing-bowl {
@@ -165,7 +232,7 @@
       justify-content: center;
       position: relative;
       overflow: hidden;
-      transition: background-color 0.45s ease, transform 0.25s ease;
+      transition: background-color 0.45s ease, transform 0.25s ease, width 0.25s ease, height 0.25s ease;
     }
 
     .mixing-bowl.swirl {
@@ -179,7 +246,7 @@
     }
 
     .bowl-label {
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.9);
       padding: 4px 12px;
       border-radius: 999px;
       font-weight: 900;
@@ -191,23 +258,24 @@
 
     .recipe-dots {
       display: flex;
-      gap: 6px;
-      min-height: 22px;
+      gap: 8px;
+      min-height: 24px;
       align-items: center;
+      justify-content: center;
     }
 
     .mini-dot {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       border: 2px solid #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.22);
     }
 
-    /* Water Rinse Cup & Brush Tools */
-    .tools-row {
+    /* Water Rinse Cup & Lab Actions */
+    .station-actions {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       width: 100%;
       justify-content: center;
       flex-wrap: wrap;
@@ -221,6 +289,327 @@
       justify-content: center;
     }
 
+    /* =============================================
+       WATERCOLOUR PALETTE UI
+       ============================================= */
+    .wc-pans {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px 10px;
+      width: 100%;
+      padding: 4px 6px;
+    }
+
+    .wc-pan {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .wc-swatch {
+      width: 56px;
+      height: 44px;
+      border-radius: 14px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16), inset 0 3px 6px rgba(255, 255, 255, 0.45);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
+    }
+
+    .wc-pan.selected .wc-swatch {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 3px #0284c7, 0 6px 14px rgba(2, 132, 199, 0.3);
+    }
+
+    .wc-pan:active .wc-swatch {
+      transform: scale(0.92);
+    }
+
+    .wc-pan-name {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #334155;
+    }
+
+    .wc-overlap-box {
+      width: 100%;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 10px 12px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e0f2fe;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .wc-overlap-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #0369a1;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .wc-venn {
+      position: relative;
+      width: 130px;
+      height: 64px;
+      background: #ffffff;
+      border-radius: 12px;
+    }
+
+    .wc-circle {
+      position: absolute;
+      top: 4px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      mix-blend-mode: multiply;
+      transition: background-color 0.25s ease, opacity 0.25s ease;
+    }
+
+    .wc-circle.prev {
+      left: 16px;
+    }
+
+    .wc-circle.curr {
+      right: 16px;
+    }
+
+    .wc-opacity-group {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .wc-opacity-btns {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .wc-alpha-btn {
+      flex: 1;
+      padding: 8px 6px;
+      font-size: 0.82rem;
+      justify-content: center;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .wc-alpha-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    /* =============================================
+       PROMINENT COLOR LAB CHALLENGE MODE
+       ============================================= */
+    .lab-header {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    body.lab-mode .mixing-station {
+      flex: 2.6;
+      width: auto;
+      min-width: 0;
+      padding: 22px 28px;
+      background: linear-gradient(180deg, #fffdf7 0%, #fff7e6 100%);
+      border: 3px solid var(--gold);
+      box-shadow: 0 10px 28px rgba(255, 183, 3, 0.18);
+    }
+
+    body.lab-mode .free-title {
+      display: none;
+    }
+
+    body.lab-mode .lab-header {
+      display: flex;
+    }
+
+    .lab-topbar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .lab-progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 1rem;
+      color: #92400e;
+      background: #fef3c7;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 2px solid #fde68a;
+    }
+
+    .lab-header-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .hint-btn {
+      background: #fef9c3;
+      color: #854d0e;
+      border: 2px solid #fde047;
+    }
+
+    .next-btn {
+      background: #2b2d42;
+      color: #ffffff;
+    }
+
+    .lab-prompt {
+      font-size: clamp(1.6rem, 3.2vw, 2.5rem);
+      font-weight: 900;
+      color: #1e293b;
+      text-align: center;
+      margin: 2px 0;
+      line-height: 1.15;
+    }
+
+    .lab-hint-pill {
+      display: none;
+      background: #fffbeb;
+      border: 2px dashed #f59e0b;
+      color: #b45309;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .lab-hint-pill.visible {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    body.lab-mode .comparison-stage {
+      gap: clamp(16px, 3vw, 44px);
+      margin: 4px 0;
+    }
+
+    body.lab-mode .lab-goal-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lab-target-swatch {
+      width: clamp(130px, 16vw, 185px);
+      height: clamp(130px, 16vw, 185px);
+      border-radius: 50%;
+      border: 8px solid #ffffff;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18), inset 0 -6px 14px rgba(0, 0, 0, 0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.35s ease, transform 0.3s ease;
+    }
+
+    .lab-swatch-caption {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #475569;
+    }
+
+    body.lab-mode .lab-match-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 4px solid #e2e8f0;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #64748b;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex-shrink: 0;
+    }
+
+    body.lab-mode .lab-match-badge.solved {
+      background: var(--mint);
+      border-color: #bbf7d0;
+      color: #ffffff;
+      transform: scale(1.2);
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4);
+    }
+
+    body.lab-mode .mixing-bowl {
+      width: clamp(140px, 17vw, 195px);
+      height: clamp(140px, 17vw, 195px);
+      border-width: 10px;
+    }
+
+    body.lab-mode .bowl-label {
+      font-size: 1.1rem;
+      padding: 6px 16px;
+    }
+
+    body.lab-mode .paint-wells {
+      gap: clamp(16px, 2.5vw, 32px);
+      padding: 6px 0 22px;
+    }
+
+    body.lab-mode .paint-blob {
+      width: clamp(64px, 7.2vw, 88px);
+      height: clamp(64px, 7.2vw, 88px);
+      border-width: 5px;
+    }
+
+    body.lab-mode .paint-blob span {
+      bottom: -24px;
+      font-size: 0.92rem;
+    }
+
+    body.lab-mode .water-btn {
+      width: auto;
+      padding: 12px 24px;
+      font-size: 1.05rem;
+    }
+
+    .lab-solved-cta {
+      display: none;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #ffffff;
+      padding: 12px 26px;
+      font-size: 1.1rem;
+      box-shadow: 0 6px 18px rgba(22, 163, 74, 0.35);
+      animation: pulseCta 1.4s infinite ease-in-out;
+    }
+
+    body.lab-mode .lab-solved-cta.visible {
+      display: flex;
+    }
+
+    @keyframes pulseCta {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
     /* Right Canvas Area */
     .canvas-container {
       flex: 1;
@@ -231,6 +620,37 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      min-width: 0;
+      transition: flex 0.28s ease;
+    }
+
+    body.lab-mode .canvas-container {
+      flex: 1;
+      min-width: 230px;
+    }
+
+    body.water-mode .canvas-container {
+      background: #fffdf9;
+      box-shadow: inset 0 0 40px rgba(186, 230, 253, 0.28), 0 6px 20px rgba(0, 0, 0, 0.07);
+    }
+
+    /* Subtle watercolour paper grain overlay */
+    .paper-grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 4;
+      background-image:
+        radial-gradient(rgba(120, 113, 108, 0.06) 1px, transparent 0),
+        radial-gradient(rgba(120, 113, 108, 0.04) 1px, transparent 0);
+      background-size: 18px 18px, 27px 27px;
+      background-position: 0 0, 9px 9px;
+      transition: opacity 0.3s ease;
+    }
+
+    body.water-mode .paper-grain {
+      opacity: 1;
     }
 
     canvas {
@@ -240,33 +660,40 @@
       cursor: crosshair;
     }
 
-    /* Challenge Banner inside Canvas */
-    .challenge-banner {
+    #strokeCanvas {
       position: absolute;
-      top: 14px;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .canvas-badge {
+      position: absolute;
+      top: 12px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.95);
-      border: 3px solid var(--gold);
+      background: rgba(255, 255, 255, 0.92);
+      border: 2px solid #e2e8f0;
       border-radius: 999px;
-      padding: 8px 20px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #475569;
+      z-index: 12;
+      pointer-events: none;
       display: none;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-      z-index: 15;
+      white-space: nowrap;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
     }
 
-    .challenge-banner.visible {
-      display: flex;
+    body.lab-mode .canvas-badge.lab-pad-badge {
+      display: block;
     }
 
-    .target-swatch {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      border: 3px solid #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    body.water-mode .canvas-badge.water-pad-badge {
+      display: block;
+      border-color: #7dd3fc;
+      color: #0369a1;
     }
 
     /* Bottom Brush & Stamp Strip */
@@ -284,20 +711,27 @@
       gap: 8px;
       align-items: center;
       z-index: 15;
+      max-width: calc(100% - 20px);
+      overflow-x: auto;
     }
 
     .brush-btn {
       padding: 8px 12px;
       font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    body.lab-mode .brush-bar .stamp-btn {
+      display: none;
     }
 
     /* Celebration Toast */
     .toast {
       position: fixed;
       top: 50%;
-      left: 58%;
+      left: 50%;
       transform: translate(-50%, -50%) scale(0.8);
-      background: rgba(43, 45, 66, 0.92);
+      background: rgba(43, 45, 66, 0.94);
       color: #fff;
       padding: 24px 36px;
       border-radius: 28px;
@@ -306,6 +740,7 @@
       opacity: 0;
       pointer-events: none;
       transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
     }
 
     .toast.show {
@@ -318,6 +753,26 @@
       color: var(--gold);
       font-size: 2rem;
     }
+
+    /* Responsive stacking on smaller / portrait screens */
+    @media (max-width: 860px) {
+      body.lab-mode .studio {
+        flex-direction: column;
+      }
+      body.lab-mode .mixing-station {
+        flex: 2.5;
+        padding: 14px 16px;
+      }
+      body.lab-mode .canvas-container {
+        flex: 1;
+        min-height: 150px;
+      }
+      body.lab-mode .lab-target-swatch,
+      body.lab-mode .mixing-bowl {
+        width: 112px;
+        height: 112px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -325,6 +780,7 @@
   <header>
     <div class="tabs">
       <button id="btnFree" class="active" onclick="setMode('free')">🎨 Free Paint</button>
+      <button id="btnWater" onclick="setMode('water')">💧 Watercolour</button>
       <button id="btnLab" onclick="setMode('lab')">🧪 Color Lab Challenge</button>
     </div>
     <div class="actions">
@@ -334,46 +790,108 @@
   </header>
 
   <main class="studio">
-    <!-- Left Color Mixing Station -->
-    <aside class="mixing-station">
-      <div class="station-title">1. Tap Colors to Mix!</div>
+    <!-- Left / Main Color Mixing Station -->
+    <aside class="mixing-station" id="mixingStation">
 
-      <div class="paint-wells">
-        <div class="paint-blob" style="background: #ef233c;" onclick="addPaint('red')"><span>Red</span></div>
-        <div class="paint-blob" style="background: #ffd100;" onclick="addPaint('yellow')"><span>Yellow</span></div>
-        <div class="paint-blob" style="background: #2563eb;" onclick="addPaint('blue')"><span>Blue</span></div>
-        <div class="paint-blob" style="background: #ffffff; border-color: #dee2e6;" onclick="addPaint('white')"><span>White</span></div>
-        <div class="paint-blob" style="background: #212529;" onclick="addPaint('black')"><span>Black</span></div>
-      </div>
+      <!-- FREE PAINT & COLOR LAB CONTROLS -->
+      <div class="free-lab-controls">
+        <div class="station-title free-title">1. Tap Colors to Mix!</div>
 
-      <div class="bowl-wrapper">
-        <div class="mixing-bowl" id="mixingBowl">
-          <div class="bowl-label" id="bowlLabel">Empty Bowl</div>
+        <!-- Prominent Color Lab Header (visible in lab mode) -->
+        <div class="lab-header">
+          <div class="lab-topbar">
+            <div class="lab-progress">
+              <span id="labProgressText">🧪 Challenge 1 / 7</span>
+              <span id="labStarsText">⭐ 0</span>
+            </div>
+            <div class="lab-header-btns">
+              <button class="hint-btn" onclick="toggleHint()">💡 Hint</button>
+              <button class="next-btn" onclick="nextChallenge()">Next ➔</button>
+            </div>
+          </div>
+          <div class="lab-prompt" id="labPrompt">Can you mix Orange?</div>
+          <div class="lab-hint-pill" id="labHintPill">💡 Try mixing Red + Yellow!</div>
         </div>
-        <div class="recipe-dots" id="recipeDots"></div>
+
+        <!-- Giant Goal vs Your Mix Stage (in free mode, only the mixing bowl shows) -->
+        <div class="comparison-stage">
+          <div class="lab-goal-wrapper">
+            <div class="lab-target-swatch" id="targetSwatch"></div>
+            <div class="lab-swatch-caption" id="targetLabel">Goal: Orange</div>
+          </div>
+
+          <div class="lab-match-badge" id="labMatchBadge">🎯</div>
+
+          <div class="bowl-wrapper">
+            <div class="mixing-bowl" id="mixingBowl">
+              <div class="bowl-label" id="bowlLabel">Empty Bowl</div>
+            </div>
+            <div class="recipe-dots" id="recipeDots"></div>
+          </div>
+        </div>
+
+        <!-- Primary Paint Blobs -->
+        <div class="paint-wells">
+          <div class="paint-blob" style="background: #ef233c;" onclick="addPaint('red')"><span>Red</span></div>
+          <div class="paint-blob" style="background: #ffd100;" onclick="addPaint('yellow')"><span>Yellow</span></div>
+          <div class="paint-blob" style="background: #2563eb;" onclick="addPaint('blue')"><span>Blue</span></div>
+          <div class="paint-blob" style="background: #ffffff; border-color: #dee2e6;" onclick="addPaint('white')"><span>White</span></div>
+          <div class="paint-blob" style="background: #212529;" onclick="addPaint('black')"><span>Black</span></div>
+        </div>
+
+        <div class="station-actions">
+          <button class="water-btn" onclick="rinseBrush()">💧 Rinse Brush in Water</button>
+          <button class="lab-solved-cta" id="labNextCta" onclick="nextChallenge()">Next Challenge ➔</button>
+        </div>
       </div>
 
-      <button class="water-btn" onclick="rinseBrush()">💧 Rinse Brush in Water</button>
+      <!-- WATERCOLOUR PALETTE CONTROLS (visible in water mode) -->
+      <div class="watercolor-controls">
+        <div>
+          <div class="station-title" style="color: #0369a1;">💧 Watercolour Studio</div>
+          <div class="station-subtitle">Paint over colors to see them mix!</div>
+        </div>
+
+        <div class="wc-pans" id="wcPans"></div>
+
+        <div class="wc-overlap-box">
+          <div class="wc-overlap-title">Transparent Mix Preview</div>
+          <div class="wc-venn">
+            <div class="wc-circle prev" id="wcPrevCircle"></div>
+            <div class="wc-circle curr" id="wcCurrCircle"></div>
+          </div>
+          <div class="station-subtitle" id="wcCurrentLabel">Blue (Translucent)</div>
+        </div>
+
+        <div class="wc-opacity-group">
+          <div class="wc-overlap-title">Water / Transparency</div>
+          <div class="wc-opacity-btns">
+            <button class="wc-alpha-btn" id="alphaSheer" onclick="setWatercolorAlpha(0.32, this)">💧 Sheer</button>
+            <button class="wc-alpha-btn active" id="alphaMed" onclick="setWatercolorAlpha(0.50, this)">💧💧 Soft</button>
+            <button class="wc-alpha-btn" id="alphaRich" onclick="setWatercolorAlpha(0.70, this)">💧💧💧 Rich</button>
+          </div>
+        </div>
+      </div>
+
     </aside>
 
     <!-- Right Painting Canvas -->
     <section class="canvas-container" id="canvasContainer">
-      <div class="challenge-banner" id="challengeBanner">
-        <div class="target-swatch" id="targetSwatch"></div>
-        <span id="challengeText" style="font-weight: 900; font-size: 1.1rem;">Make Orange!</span>
-        <button onclick="nextChallenge()" style="padding: 6px 12px; font-size: 0.85rem;">Next ➔</button>
-      </div>
+      <div class="canvas-badge lab-pad-badge">🖌️ Test Your Color Here!</div>
+      <div class="canvas-badge water-pad-badge">💧 Transparent Watercolour Paper — Overlap strokes to mix!</div>
 
       <canvas id="paintCanvas"></canvas>
+      <canvas id="strokeCanvas"></canvas>
+      <div class="paper-grain"></div>
 
       <div class="brush-bar">
-        <button class="brush-btn active" id="toolSmall" onclick="setTool('brush', 14, this)">🖌️ Thin</button>
-        <button class="brush-btn" id="toolMed" onclick="setTool('brush', 32, this)">🖌️ Big</button>
-        <button class="brush-btn" id="toolMega" onclick="setTool('brush', 60, this)"> roller</button>
-        <button class="brush-btn" id="stampStar" onclick="setTool('stamp', '⭐', this)">⭐</button>
-        <button class="brush-btn" id="stampHeart" onclick="setTool('stamp', '❤️', this)">❤️</button>
-        <button class="brush-btn" id="stampDino" onclick="setTool('stamp', '🦕', this)">🦕</button>
-        <button class="brush-btn" id="stampCar" onclick="setTool('stamp', '🚗', this)">🚗</button>
+        <button class="brush-btn active" id="toolSmall" onclick="setTool('brush', 16, this)">🖌️ Thin</button>
+        <button class="brush-btn" id="toolMed" onclick="setTool('brush', 36, this)">🖌️ Big</button>
+        <button class="brush-btn" id="toolMega" onclick="setTool('brush', 68, this)">🖌️ Roller</button>
+        <button class="brush-btn stamp-btn" id="stampStar" onclick="setTool('stamp', '⭐', this)">⭐</button>
+        <button class="brush-btn stamp-btn" id="stampHeart" onclick="setTool('stamp', '❤️', this)">❤️</button>
+        <button class="brush-btn stamp-btn" id="stampDino" onclick="setTool('stamp', '🦕', this)">🦕</button>
+        <button class="brush-btn stamp-btn" id="stampCar" onclick="setTool('stamp', '🚗', this)">🚗</button>
       </div>
     </section>
   </main>
@@ -392,6 +910,19 @@
       black:  { name: "Black",  rgb: [33, 37, 41],    hex: "#212529" }
     };
 
+    // Subtractive-friendly watercolour pigments so multiply blending produces clean green, orange & purple
+    const WATERCOLOR_PANS = [
+      { key: "red",    name: "Red",    hex: "#ff2e55", isWater: false },
+      { key: "yellow", name: "Yellow", hex: "#ffe100", isWater: false },
+      { key: "blue",   name: "Blue",   hex: "#0095ff", isWater: false },
+      { key: "orange", name: "Orange", hex: "#ff7a00", isWater: false },
+      { key: "green",  name: "Green",  hex: "#16c47f", isWater: false },
+      { key: "purple", name: "Purple", hex: "#9333ea", isWater: false },
+      { key: "pink",   name: "Pink",   hex: "#ff5ca8", isWater: false },
+      { key: "black",  name: "Ink",    hex: "#334155", isWater: false },
+      { key: "water",  name: "Water",  hex: "#ffffff", isWater: true  }
+    ];
+
     // Exact toddler-friendly color recipes
     const RECIPES = [
       { keys: ["red"], name: "Red", hex: "#ef233c" },
@@ -406,8 +937,7 @@
       { keys: ["blue", "white"], name: "Light Blue", hex: "#60a5fa" },
       { keys: ["white", "yellow"], name: "Cream Yellow", hex: "#fef08a" },
       { keys: ["black", "white"], name: "Gray", hex: "#9ca3af" },
-      { keys: ["blue", "red", "yellow"], name: "Brown", hex: "#78350f" },
-      { keys: ["blue", "green", "yellow"], name: "Lime Green", hex: "#84cc16" }
+      { keys: ["blue", "red", "yellow"], name: "Brown", hex: "#78350f" }
     ];
 
     const CHALLENGES = [
@@ -423,12 +953,18 @@
     let mixedIngredients = [];
     let currentColorHex = "#ef233c";
     let currentColorName = "Red";
-    let mode = "free"; // 'free' | 'lab'
+    let mode = "free"; // 'free' | 'water' | 'lab'
     let currentChallengeIdx = 0;
     let challengeSolved = false;
+    let solvedChallenges = new Set();
+
+    // Watercolour state
+    let wcColor = WATERCOLOR_PANS[2]; // Blue
+    let wcPrevColor = WATERCOLOR_PANS[1]; // Yellow
+    let watercolorAlpha = 0.50;
 
     let toolType = "brush"; // 'brush' | 'stamp'
-    let brushSize = 14;
+    let brushSize = 16;
     let stampChar = "⭐";
     let isDrawing = false;
     let lastX = 0;
@@ -437,19 +973,63 @@
 
     const canvas = document.getElementById("paintCanvas");
     const ctx = canvas.getContext("2d");
+    const strokeCanvas = document.getElementById("strokeCanvas");
+    const strokeCtx = strokeCanvas.getContext("2d");
+
+    // Offscreen backup so shrinking canvas in Lab mode never loses painting
+    const backupCanvas = document.createElement("canvas");
+    const backupCtx = backupCanvas.getContext("2d");
+
+    function fillWhitePaper(targetCtx, w, h) {
+      targetCtx.save();
+      targetCtx.globalCompositeOperation = "source-over";
+      targetCtx.globalAlpha = 1;
+      targetCtx.fillStyle = "#ffffff";
+      targetCtx.fillRect(0, 0, w, h);
+      targetCtx.restore();
+    }
+
+    function syncBackup() {
+      if (canvas.width === 0 || canvas.height === 0) return;
+      if (canvas.width > backupCanvas.width || canvas.height > backupCanvas.height) {
+        const prev = document.createElement("canvas");
+        prev.width = backupCanvas.width;
+        prev.height = backupCanvas.height;
+        if (prev.width > 0 && prev.height > 0) {
+          prev.getContext("2d").drawImage(backupCanvas, 0, 0);
+        }
+        backupCanvas.width = Math.max(backupCanvas.width, canvas.width);
+        backupCanvas.height = Math.max(backupCanvas.height, canvas.height);
+        fillWhitePaper(backupCtx, backupCanvas.width, backupCanvas.height);
+        if (prev.width > 0 && prev.height > 0) {
+          backupCtx.drawImage(prev, 0, 0);
+        }
+      }
+      backupCtx.drawImage(canvas, 0, 0);
+    }
 
     function resizeCanvas() {
       const container = document.getElementById("canvasContainer");
-      const temp = document.createElement("canvas");
-      temp.width = canvas.width;
-      temp.height = canvas.height;
-      temp.getContext("2d").drawImage(canvas, 0, 0);
+      const newW = container.clientWidth;
+      const newH = container.clientHeight;
+      if (newW === 0 || newH === 0) return;
 
-      canvas.width = container.clientWidth;
-      canvas.height = container.clientHeight;
+      syncBackup();
+
+      canvas.width = newW;
+      canvas.height = newH;
+      strokeCanvas.width = newW;
+      strokeCanvas.height = newH;
+
+      fillWhitePaper(ctx, newW, newH);
+      if (backupCanvas.width > 0 && backupCanvas.height > 0) {
+        ctx.drawImage(backupCanvas, 0, 0);
+      }
+
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctx.drawImage(temp, 0, 0);
+      strokeCtx.lineCap = "round";
+      strokeCtx.lineJoin = "round";
     }
 
     window.addEventListener("resize", resizeCanvas);
@@ -479,6 +1059,76 @@
       utter.rate = 0.96;
       utter.pitch = 1.15;
       window.speechSynthesis.speak(utter);
+    }
+
+    // Build Watercolour Pans
+    function initWatercolorPalette() {
+      const container = document.getElementById("wcPans");
+      container.innerHTML = "";
+      WATERCOLOR_PANS.forEach(pan => {
+        const el = document.createElement("div");
+        el.className = "wc-pan" + (pan.key === wcColor.key ? " selected" : "");
+        el.dataset.key = pan.key;
+        const bgStyle = pan.isWater
+          ? "background: linear-gradient(135deg, #e0f2fe, #ffffff); border-color: #7dd3fc;"
+          : `background: ${pan.hex};`;
+        el.innerHTML = `
+          <div class="wc-swatch" style="${bgStyle}"></div>
+          <span class="wc-pan-name">${pan.isWater ? "💧 Water" : pan.name}</span>
+        `;
+        el.onclick = () => selectWatercolor(pan);
+        container.appendChild(el);
+      });
+      updateWatercolorPreview();
+    }
+
+    function selectWatercolor(pan) {
+      if (pan.key !== wcColor.key && !wcColor.isWater) {
+        wcPrevColor = wcColor;
+      }
+      wcColor = pan;
+      document.querySelectorAll(".wc-pan").forEach(el => {
+        el.classList.toggle("selected", el.dataset.key === pan.key);
+      });
+      playTone(pan.isWater ? 580 : 440, 0.16);
+      speak(pan.isWater ? "Clean water" : pan.name);
+      updateWatercolorPreview();
+    }
+
+    function setWatercolorAlpha(val, btnEl) {
+      watercolorAlpha = val;
+      document.querySelectorAll(".wc-alpha-btn").forEach(b => b.classList.remove("active"));
+      btnEl.classList.add("active");
+      playTone(500, 0.12);
+      updateWatercolorPreview();
+    }
+
+    function updateWatercolorPreview() {
+      const prevEl = document.getElementById("wcPrevCircle");
+      const currEl = document.getElementById("wcCurrCircle");
+      const labelEl = document.getElementById("wcCurrentLabel");
+
+      prevEl.style.backgroundColor = wcPrevColor.hex;
+      prevEl.style.opacity = Math.min(0.85, watercolorAlpha + 0.15);
+
+      currEl.style.backgroundColor = wcColor.isWater ? "#bae6fd" : wcColor.hex;
+      currEl.style.opacity = wcColor.isWater ? 0.55 : Math.min(0.85, watercolorAlpha + 0.15);
+
+      labelEl.textContent = wcColor.isWater
+        ? "Clean Water Wash (Softens colors)"
+        : `${wcColor.name} + ${wcPrevColor.name} overlap`;
+
+      updateStrokeCanvasStyle();
+    }
+
+    function updateStrokeCanvasStyle() {
+      if (mode === "water") {
+        strokeCanvas.style.opacity = wcColor.isWater ? 0.42 : watercolorAlpha;
+        strokeCanvas.style.mixBlendMode = wcColor.isWater ? "normal" : "multiply";
+      } else {
+        strokeCanvas.style.opacity = 1;
+        strokeCanvas.style.mixBlendMode = "normal";
+      }
     }
 
     function addPaint(colorKey) {
@@ -526,10 +1176,18 @@
         const target = CHALLENGES[currentChallengeIdx];
         if (result.name === target.targetName) {
           challengeSolved = true;
+          solvedChallenges.add(currentChallengeIdx);
+          updateLabScore();
+
+          const badge = document.getElementById("labMatchBadge");
+          badge.classList.add("solved");
+          badge.textContent = "✓";
+          document.getElementById("labNextCta").classList.add("visible");
+
           playTone(523.25, 0.18, 0);
           playTone(659.25, 0.18, 0.14);
           playTone(783.99, 0.35, 0.28);
-          showToast(`You made ${target.targetName}! 🎉`, "Now paint with your new color!");
+          showToast(`You made ${target.targetName}! 🎉`, "Try painting on the right or tap Next Challenge!");
           setTimeout(() => {
             speak(`Hooray! You made ${target.targetName}!`);
           }, 900);
@@ -560,7 +1218,7 @@
       return { name: "Muddy Brown", hex: `rgb(${r}, ${g}, ${b})` };
     }
 
-    function rinseBrush() {
+    function rinseBrush(silent = false) {
       mixedIngredients = [];
       currentColorHex = "#ef233c";
       currentColorName = "Red";
@@ -568,29 +1226,72 @@
       bowl.style.backgroundColor = "#f1f3f5";
       document.getElementById("bowlLabel").textContent = "Clean Bowl";
       document.getElementById("recipeDots").innerHTML = "";
-      playTone(587.33, 0.15, 0);
-      playTone(440.00, 0.2, 0.12);
-      speak("Splash! Brush is clean!");
+      if (!silent) {
+        playTone(587.33, 0.15, 0);
+        playTone(440.00, 0.2, 0.12);
+        speak("Splash! Brush is clean!");
+      }
     }
 
     function setMode(newMode) {
       mode = newMode;
+      document.body.classList.toggle("water-mode", mode === "water");
+      document.body.classList.toggle("lab-mode", mode === "lab");
+
       document.getElementById("btnFree").classList.toggle("active", mode === "free");
+      document.getElementById("btnWater").classList.toggle("active-water", mode === "water");
       document.getElementById("btnLab").classList.toggle("active", mode === "lab");
-      document.getElementById("challengeBanner").classList.toggle("visible", mode === "lab");
+
+      updateStrokeCanvasStyle();
 
       if (mode === "lab") {
         loadChallenge(currentChallengeIdx);
+      } else if (mode === "water") {
+        playTone(520, 0.16);
+        speak("Watercolour mode! Paint colors on top of each other to see them mix!");
       }
+
+      // Resize canvas after layout transition settles
+      requestAnimationFrame(() => {
+        resizeCanvas();
+        setTimeout(resizeCanvas, 310);
+      });
+    }
+
+    function updateLabScore() {
+      document.getElementById("labProgressText").textContent =
+        `🧪 Challenge ${(currentChallengeIdx % CHALLENGES.length) + 1} / ${CHALLENGES.length}`;
+      document.getElementById("labStarsText").textContent = `⭐ ${solvedChallenges.size}`;
     }
 
     function loadChallenge(idx) {
       challengeSolved = false;
-      rinseBrush();
+      rinseBrush(true);
       const ch = CHALLENGES[idx % CHALLENGES.length];
       document.getElementById("targetSwatch").style.background = ch.hex;
-      document.getElementById("challengeText").textContent = `Can you mix ${ch.targetName}?`;
+      document.getElementById("targetLabel").textContent = `Goal: ${ch.targetName}`;
+      document.getElementById("labPrompt").textContent = `Can you mix ${ch.targetName}?`;
+      const hintEl = document.getElementById("labHintPill");
+      hintEl.textContent = `💡 Try mixing ${ch.hint}!`;
+      hintEl.classList.remove("visible");
+
+      const badge = document.getElementById("labMatchBadge");
+      badge.classList.remove("solved");
+      badge.textContent = "🎯";
+      document.getElementById("labNextCta").classList.remove("visible");
+
+      updateLabScore();
       speak(`Can you mix ${ch.targetName}?`);
+    }
+
+    function toggleHint() {
+      const hintEl = document.getElementById("labHintPill");
+      const ch = CHALLENGES[currentChallengeIdx % CHALLENGES.length];
+      hintEl.classList.toggle("visible");
+      if (hintEl.classList.contains("visible")) {
+        playTone(620, 0.15);
+        speak(`Try mixing ${ch.hint}!`);
+      }
     }
 
     function nextChallenge() {
@@ -616,12 +1317,15 @@
     }
 
     function clearCanvas() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      fillWhitePaper(ctx, canvas.width, canvas.height);
+      strokeCtx.clearRect(0, 0, strokeCanvas.width, strokeCanvas.height);
+      if (backupCanvas.width > 0 && backupCanvas.height > 0) {
+        fillWhitePaper(backupCtx, backupCanvas.width, backupCanvas.height);
+      }
       playTone(300, 0.2);
     }
 
     function savePainting() {
-      // Composite white background so saved PNG isn't transparent
       const out = document.createElement("canvas");
       out.width = canvas.width;
       out.height = canvas.height;
@@ -646,18 +1350,37 @@
       };
     }
 
+    function getActivePaintHex() {
+      return mode === "water" ? wcColor.hex : currentColorHex;
+    }
+
+    function commitWatercolorStroke() {
+      if (mode !== "water") return;
+      ctx.save();
+      ctx.globalAlpha = wcColor.isWater ? 0.42 : watercolorAlpha;
+      ctx.globalCompositeOperation = wcColor.isWater ? "source-over" : "multiply";
+      ctx.drawImage(strokeCanvas, 0, 0);
+      ctx.restore();
+      strokeCtx.clearRect(0, 0, strokeCanvas.width, strokeCanvas.height);
+    }
+
     canvas.addEventListener("pointerdown", (e) => {
       e.preventDefault();
-      if (mixedIngredients.length === 0) {
+      if (mode !== "water" && mixedIngredients.length === 0) {
         addPaint("red"); // Auto-dip red if bowl was empty so toddler always paints immediately
       }
       const pos = getPos(e);
 
       if (toolType === "stamp") {
+        ctx.save();
         ctx.font = "54px serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
+        if (mode === "water") {
+          ctx.globalAlpha = Math.min(0.85, watercolorAlpha + 0.2);
+        }
         ctx.fillText(stampChar, pos.x, pos.y);
+        ctx.restore();
         playTone(523.25, 0.15);
         return;
       }
@@ -666,37 +1389,82 @@
       lastX = pos.x;
       lastY = pos.y;
 
-      // Paint dot on single tap
-      ctx.fillStyle = currentColorHex;
-      ctx.beginPath();
-      ctx.arc(pos.x, pos.y, brushSize / 2, 0, Math.PI * 2);
-      ctx.fill();
+      const activeHex = getActivePaintHex();
+
+      if (mode === "water") {
+        updateStrokeCanvasStyle();
+        strokeCtx.clearRect(0, 0, strokeCanvas.width, strokeCanvas.height);
+        strokeCtx.save();
+        strokeCtx.fillStyle = activeHex;
+        strokeCtx.shadowColor = activeHex;
+        strokeCtx.shadowBlur = Math.max(6, brushSize * 0.32);
+        strokeCtx.beginPath();
+        strokeCtx.arc(pos.x, pos.y, brushSize / 2, 0, Math.PI * 2);
+        strokeCtx.fill();
+        strokeCtx.restore();
+      } else {
+        ctx.save();
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = activeHex;
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, brushSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
     });
 
     canvas.addEventListener("pointermove", (e) => {
       if (!isDrawing || toolType !== "brush") return;
       e.preventDefault();
       const pos = getPos(e);
+      const activeHex = getActivePaintHex();
 
-      ctx.strokeStyle = currentColorHex;
-      ctx.lineWidth = brushSize;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
+      if (mode === "water") {
+        strokeCtx.save();
+        strokeCtx.strokeStyle = activeHex;
+        strokeCtx.lineWidth = brushSize;
+        strokeCtx.lineCap = "round";
+        strokeCtx.lineJoin = "round";
+        strokeCtx.shadowColor = activeHex;
+        strokeCtx.shadowBlur = Math.max(6, brushSize * 0.32);
 
-      ctx.beginPath();
-      ctx.moveTo(lastX, lastY);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.stroke();
+        strokeCtx.beginPath();
+        strokeCtx.moveTo(lastX, lastY);
+        strokeCtx.lineTo(pos.x, pos.y);
+        strokeCtx.stroke();
+        strokeCtx.restore();
+      } else {
+        ctx.save();
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = activeHex;
+        ctx.lineWidth = brushSize;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        ctx.restore();
+      }
 
       lastX = pos.x;
       lastY = pos.y;
     }, { passive: false });
 
-    window.addEventListener("pointerup", () => {
+    function finishStroke() {
+      if (!isDrawing) return;
       isDrawing = false;
-    });
+      commitWatercolorStroke();
+    }
+
+    window.addEventListener("pointerup", finishStroke);
+    window.addEventListener("pointercancel", finishStroke);
 
     // Initialize
+    initWatercolorPalette();
     resizeCanvas();
     addPaint("red");
   </script>
