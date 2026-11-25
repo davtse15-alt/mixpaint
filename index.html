@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Color Mixing Studio</title>
@@ -29,6 +29,7 @@
       padding: 0;
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Rounded Mplus 1c", "Nunito", sans-serif;
       background: var(--bg);
@@ -773,6 +774,395 @@
         height: 112px;
       }
     }
+
+    /* =============================================
+       IPHONE / SMALL PHONE PORTRAIT (never triggers on iPad)
+       ============================================= */
+    @media (max-width: 700px) {
+      header {
+        padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 7px max(10px, env(safe-area-inset-left));
+        gap: 6px;
+        justify-content: center;
+      }
+
+      .tabs, .actions {
+        width: 100%;
+        justify-content: center;
+        gap: 5px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        touch-action: pan-x;
+      }
+      .tabs::-webkit-scrollbar, .actions::-webkit-scrollbar {
+        display: none;
+      }
+
+      header button {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+        gap: 4px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .studio {
+        flex-direction: column;
+        padding: 6px max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+        gap: 6px;
+      }
+
+      /* Compact horizontal mixing strip above canvas in Free Paint & Watercolour */
+      .mixing-station {
+        width: 100%;
+        min-width: 0;
+        flex: 0 0 auto;
+        padding: 8px 10px;
+        border-radius: 16px;
+        overflow: visible;
+      }
+
+      .free-title {
+        display: none;
+      }
+
+      body:not(.lab-mode) .free-lab-controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px 8px;
+      }
+
+      body:not(.lab-mode) .comparison-stage {
+        width: auto;
+        gap: 6px;
+      }
+
+      body:not(.lab-mode) .bowl-wrapper {
+        flex-direction: row;
+        gap: 6px;
+        margin-top: 0;
+      }
+
+      body:not(.lab-mode) .mixing-bowl {
+        width: 56px;
+        height: 56px;
+        border-width: 4px;
+      }
+
+      body:not(.lab-mode) .bowl-label {
+        font-size: 0.62rem;
+        padding: 2px 5px;
+        line-height: 1.1;
+      }
+
+      body:not(.lab-mode) .recipe-dots {
+        flex-direction: column;
+        gap: 3px;
+        min-height: 0;
+      }
+
+      body:not(.lab-mode) .mini-dot {
+        width: 12px;
+        height: 12px;
+        border-width: 1.5px;
+      }
+
+      body:not(.lab-mode) .paint-wells {
+        flex: 1;
+        gap: 8px;
+        padding-bottom: 14px;
+        justify-content: center;
+      }
+
+      body:not(.lab-mode) .paint-blob {
+        width: 38px;
+        height: 38px;
+        border-width: 3px;
+      }
+
+      body:not(.lab-mode) .paint-blob span {
+        bottom: -15px;
+        font-size: 0.64rem;
+      }
+
+      body:not(.lab-mode) .station-actions {
+        width: 100%;
+        gap: 6px;
+      }
+
+      body:not(.lab-mode) .water-btn {
+        padding: 6px 12px;
+        font-size: 0.78rem;
+      }
+
+      /* Compact Watercolour strip on portrait iPhone */
+      body.water-mode .watercolor-controls {
+        gap: 6px;
+      }
+
+      body.water-mode .watercolor-controls > div:first-child,
+      body.water-mode .wc-overlap-box,
+      body.water-mode .wc-opacity-group .wc-overlap-title {
+        display: none;
+      }
+
+      body.water-mode .wc-pans {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 8px;
+        padding: 2px 2px 4px;
+        scrollbar-width: none;
+        touch-action: pan-x;
+      }
+      body.water-mode .wc-pans::-webkit-scrollbar {
+        display: none;
+      }
+
+      body.water-mode .wc-pan {
+        flex: 0 0 auto;
+        gap: 2px;
+      }
+
+      body.water-mode .wc-swatch {
+        width: 40px;
+        height: 32px;
+        border-radius: 10px;
+        border-width: 2px;
+      }
+
+      body.water-mode .wc-pan-name {
+        font-size: 0.65rem;
+      }
+
+      body.water-mode .wc-alpha-btn {
+        padding: 5px 6px;
+        font-size: 0.74rem;
+      }
+
+      /* Color Lab Challenge on portrait iPhone */
+      body.lab-mode .mixing-station {
+        flex: 1.7;
+        padding: 10px 12px;
+        overflow-y: auto;
+        touch-action: pan-y;
+      }
+
+      body.lab-mode .free-lab-controls {
+        gap: 8px;
+      }
+
+      body.lab-mode .lab-header {
+        gap: 6px;
+      }
+
+      body.lab-mode .lab-progress {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        gap: 6px;
+      }
+
+      body.lab-mode .lab-header-btns button {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+      }
+
+      body.lab-mode .lab-prompt {
+        font-size: 1.25rem;
+      }
+
+      body.lab-mode .lab-hint-pill {
+        font-size: 0.82rem;
+        padding: 4px 12px;
+      }
+
+      body.lab-mode .comparison-stage {
+        gap: 12px;
+      }
+
+      body.lab-mode .lab-target-swatch,
+      body.lab-mode .mixing-bowl {
+        width: 86px;
+        height: 86px;
+        border-width: 5px;
+      }
+
+      body.lab-mode .lab-swatch-caption,
+      body.lab-mode .bowl-label {
+        font-size: 0.82rem;
+        padding: 3px 9px;
+      }
+
+      body.lab-mode .lab-match-badge {
+        width: 42px;
+        height: 42px;
+        font-size: 1.2rem;
+        border-width: 3px;
+      }
+
+      body.lab-mode .paint-wells {
+        gap: 10px;
+        padding: 2px 0 16px;
+      }
+
+      body.lab-mode .paint-blob {
+        width: 46px;
+        height: 46px;
+        border-width: 3px;
+      }
+
+      body.lab-mode .paint-blob span {
+        bottom: -18px;
+        font-size: 0.72rem;
+      }
+
+      body.lab-mode .water-btn,
+      body.lab-mode .lab-solved-cta {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+      }
+
+      body.lab-mode .canvas-container {
+        flex: 1;
+        min-width: 0;
+        min-height: 130px;
+      }
+
+      .canvas-container {
+        border-radius: 16px;
+        min-height: 0;
+      }
+
+      .canvas-badge {
+        top: 6px;
+        font-size: 0.72rem;
+        padding: 4px 10px;
+        max-width: calc(100% - 16px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .brush-bar {
+        bottom: 8px;
+        padding: 5px 8px;
+        gap: 5px;
+        max-width: calc(100% - 12px);
+        touch-action: pan-x;
+      }
+
+      .brush-btn {
+        padding: 6px 9px;
+        font-size: 0.78rem;
+      }
+
+      .toast {
+        padding: 16px 22px;
+        border-radius: 20px;
+        max-width: calc(100vw - 32px);
+      }
+
+      .toast h2 {
+        font-size: 1.4rem;
+      }
+    }
+
+    /* =============================================
+       IPHONE LANDSCAPE (never triggers on iPad)
+       ============================================= */
+    @media (max-height: 480px) and (pointer: coarse) {
+      header {
+        padding: 4px max(12px, env(safe-area-inset-right)) 4px max(12px, env(safe-area-inset-left));
+        gap: 6px;
+        flex-wrap: nowrap;
+      }
+
+      .tabs, .actions {
+        width: auto;
+        gap: 4px;
+        flex-wrap: nowrap;
+      }
+
+      header button {
+        padding: 5px 9px;
+        font-size: 0.74rem;
+        gap: 4px;
+        white-space: nowrap;
+      }
+
+      .studio,
+      body.lab-mode .studio {
+        flex-direction: row;
+        padding: 6px max(10px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+        gap: 8px;
+      }
+
+      .mixing-station {
+        width: 215px;
+        min-width: 195px;
+        flex: 0 0 auto;
+        padding: 8px;
+        border-radius: 16px;
+      }
+
+      .station-title { font-size: 0.9rem; }
+      .station-subtitle { display: none; }
+
+      .free-lab-controls, .watercolor-controls {
+        gap: 6px;
+      }
+
+      .mixing-bowl {
+        width: 78px;
+        height: 78px;
+        border-width: 5px;
+      }
+
+      .bowl-label {
+        font-size: 0.72rem;
+        padding: 2px 7px;
+      }
+
+      .recipe-dots { min-height: 16px; gap: 5px; }
+      .mini-dot { width: 14px; height: 14px; }
+
+      .paint-wells { gap: 8px; padding-bottom: 12px; }
+      .paint-blob { width: 36px; height: 36px; border-width: 3px; }
+      .paint-blob span { bottom: -14px; font-size: 0.62rem; }
+      .water-btn { padding: 6px 10px; font-size: 0.74rem; }
+
+      .wc-overlap-box,
+      .wc-opacity-group .wc-overlap-title {
+        display: none;
+      }
+
+      .wc-pans { gap: 6px; padding: 2px; }
+      .wc-swatch { width: 42px; height: 28px; border-radius: 9px; border-width: 2px; }
+      .wc-pan-name { font-size: 0.64rem; }
+      .wc-alpha-btn { padding: 5px 4px; font-size: 0.7rem; }
+
+      body.lab-mode .mixing-station {
+        flex: 1.8;
+        width: auto;
+        min-width: 0;
+        padding: 8px 12px;
+      }
+
+      body.lab-mode .lab-progress { font-size: 0.76rem; padding: 4px 10px; }
+      body.lab-mode .lab-header-btns button { padding: 4px 9px; font-size: 0.74rem; }
+      body.lab-mode .lab-prompt { font-size: 1.15rem; }
+      body.lab-mode .lab-target-swatch,
+      body.lab-mode .mixing-bowl { width: 78px; height: 78px; border-width: 5px; }
+      body.lab-mode .lab-match-badge { width: 38px; height: 38px; font-size: 1.1rem; }
+      body.lab-mode .lab-swatch-caption { font-size: 0.78rem; }
+      body.lab-mode .paint-blob { width: 42px; height: 42px; border-width: 3px; }
+      body.lab-mode .paint-wells { gap: 10px; padding: 2px 0 14px; }
+      body.lab-mode .canvas-container { flex: 1; min-width: 170px; min-height: 0; }
+
+      .brush-bar { bottom: 6px; padding: 4px 8px; gap: 4px; }
+      .brush-btn { padding: 5px 8px; font-size: 0.76rem; }
+    }
   </style>
 </head>
 <body>
@@ -1033,6 +1423,7 @@
     }
 
     window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("orientationchange", () => setTimeout(resizeCanvas, 200));
 
     function playTone(freq, duration = 0.2, delay = 0) {
       try {
