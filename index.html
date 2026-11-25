@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Color Mixing Studio</title>
+  <style>
+    :root {
+      --bg: #fdf8f0;
+      --panel: #ffffff;
+      --ink: #2b2d42;
+      --gold: #ffb703;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Rounded Mplus 1c", "Nunito", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Bar */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 18px;
+      background: var(--panel);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      z-index: 20;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tabs, .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      background: #edf2f4;
+      color: var(--ink);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+      transition: transform 0.12s ease, background 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button:active {
+      transform: scale(0.93);
+    }
+
+    button.active {
+      background: var(--gold);
+      color: #1d1e2c;
+    }
+
+    /* Main Workspace */
+    .studio {
+      flex: 1;
+      display: flex;
+      padding: 12px;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    /* Left Mixing Station */
+    .mixing-station {
+      width: 310px;
+      min-width: 280px;
+      background: var(--panel);
+      border-radius: 24px;
+      padding: 14px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .station-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      text-align: center;
+      color: #4a4e69;
+    }
+
+    /* Primary Paint Tubes / Blobs */
+    .paint-wells {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .paint-blob {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 -4px 8px rgba(0, 0, 0, 0.18);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.15s ease;
+    }
+
+    .paint-blob:active {
+      transform: scale(0.88);
+    }
+
+    .paint-blob span {
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #4a4e69;
+      white-space: nowrap;
+    }
+
+    /* Center Mixing Bowl */
+    .bowl-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .mixing-bowl {
+      width: 148px;
+      height: 148px;
+      border-radius: 50%;
+      background: #f1f3f5;
+      border: 8px solid #dee2e6;
+      box-shadow: inset 0 8px 18px rgba(0, 0, 0, 0.15), 0 8px 18px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: background-color 0.45s ease, transform 0.25s ease;
+    }
+
+    .mixing-bowl.swirl {
+      animation: swirlBowl 0.45s ease;
+    }
+
+    @keyframes swirlBowl {
+      0% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.08) rotate(18deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .bowl-label {
+      background: rgba(255, 255, 255, 0.88);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 0.95rem;
+      color: #2b2d42;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      text-align: center;
+    }
+
+    .recipe-dots {
+      display: flex;
+      gap: 6px;
+      min-height: 22px;
+      align-items: center;
+    }
+
+    .mini-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Water Rinse Cup & Brush Tools */
+    .tools-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .water-btn {
+      background: #caf0f8;
+      color: #0077b6;
+      border: 2px solid #90e0ef;
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* Right Canvas Area */
+    .canvas-container {
+      flex: 1;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Challenge Banner inside Canvas */
+    .challenge-banner {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      border: 3px solid var(--gold);
+      border-radius: 999px;
+      padding: 8px 20px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+      z-index: 15;
+    }
+
+    .challenge-banner.visible {
+      display: flex;
+    }
+
+    .target-swatch {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    /* Bottom Brush & Stamp Strip */
+    .brush-bar {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(6px);
+      padding: 8px 14px;
+      border-radius: 999px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      z-index: 15;
+    }
+
+    .brush-btn {
+      padding: 8px 12px;
+      font-size: 0.95rem;
+    }
+
+    /* Celebration Toast */
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 58%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(43, 45, 66, 0.92);
+      color: #fff;
+      padding: 24px 36px;
+      border-radius: 28px;
+      text-align: center;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .toast h2 {
+      margin: 0 0 8px;
+      color: var(--gold);
+      font-size: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="tabs">
+      <button id="btnFree" class="active" onclick="setMode('free')">🎨 Free Paint</button>
+      <button id="btnLab" onclick="setMode('lab')">🧪 Color Lab Challenge</button>
+    </div>
+    <div class="actions">
+      <button onclick="clearCanvas()">🗑️ Clear Paper</button>
+      <button onclick="savePainting()">📸 Save Art</button>
+    </div>
+  </header>
+
+  <main class="studio">
+    <!-- Left Color Mixing Station -->
+    <aside class="mixing-station">
+      <div class="station-title">1. Tap Colors to Mix!</div>
+
+      <div class="paint-wells">
+        <div class="paint-blob" style="background: #ef233c;" onclick="addPaint('red')"><span>Red</span></div>
+        <div class="paint-blob" style="background: #ffd100;" onclick="addPaint('yellow')"><span>Yellow</span></div>
+        <div class="paint-blob" style="background: #2563eb;" onclick="addPaint('blue')"><span>Blue</span></div>
+        <div class="paint-blob" style="background: #ffffff; border-color: #dee2e6;" onclick="addPaint('white')"><span>White</span></div>
+        <div class="paint-blob" style="background: #212529;" onclick="addPaint('black')"><span>Black</span></div>
+      </div>
+
+      <div class="bowl-wrapper">
+        <div class="mixing-bowl" id="mixingBowl">
+          <div class="bowl-label" id="bowlLabel">Empty Bowl</div>
+        </div>
+        <div class="recipe-dots" id="recipeDots"></div>
+      </div>
+
+      <button class="water-btn" onclick="rinseBrush()">💧 Rinse Brush in Water</button>
+    </aside>
+
+    <!-- Right Painting Canvas -->
+    <section class="canvas-container" id="canvasContainer">
+      <div class="challenge-banner" id="challengeBanner">
+        <div class="target-swatch" id="targetSwatch"></div>
+        <span id="challengeText" style="font-weight: 900; font-size: 1.1rem;">Make Orange!</span>
+        <button onclick="nextChallenge()" style="padding: 6px 12px; font-size: 0.85rem;">Next ➔</button>
+      </div>
+
+      <canvas id="paintCanvas"></canvas>
+
+      <div class="brush-bar">
+        <button class="brush-btn active" id="toolSmall" onclick="setTool('brush', 14, this)">🖌️ Thin</button>
+        <button class="brush-btn" id="toolMed" onclick="setTool('brush', 32, this)">🖌️ Big</button>
+        <button class="brush-btn" id="toolMega" onclick="setTool('brush', 60, this)"> roller</button>
+        <button class="brush-btn" id="stampStar" onclick="setTool('stamp', '⭐', this)">⭐</button>
+        <button class="brush-btn" id="stampHeart" onclick="setTool('stamp', '❤️', this)">❤️</button>
+        <button class="brush-btn" id="stampDino" onclick="setTool('stamp', '🦕', this)">🦕</button>
+        <button class="brush-btn" id="stampCar" onclick="setTool('stamp', '🚗', this)">🚗</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast">
+    <h2 id="toastTitle">Awesome!</h2>
+    <p id="toastSub" style="margin:0; font-size:1.2rem;">You mixed Orange!</p>
+  </div>
+
+  <script>
+    const BASE_COLORS = {
+      red:    { name: "Red",    rgb: [239, 35, 60],   hex: "#ef233c" },
+      yellow: { name: "Yellow", rgb: [255, 209, 0],   hex: "#ffd100" },
+      blue:   { name: "Blue",   rgb: [37, 99, 235],   hex: "#2563eb" },
+      white:  { name: "White",  rgb: [255, 255, 255], hex: "#ffffff" },
+      black:  { name: "Black",  rgb: [33, 37, 41],    hex: "#212529" }
+    };
+
+    // Exact toddler-friendly color recipes
+    const RECIPES = [
+      { keys: ["red"], name: "Red", hex: "#ef233c" },
+      { keys: ["yellow"], name: "Yellow", hex: "#ffd100" },
+      { keys: ["blue"], name: "Blue", hex: "#2563eb" },
+      { keys: ["white"], name: "White", hex: "#ffffff" },
+      { keys: ["black"], name: "Black", hex: "#212529" },
+      { keys: ["red", "yellow"], name: "Orange", hex: "#ff7b00" },
+      { keys: ["blue", "yellow"], name: "Green", hex: "#16a34a" },
+      { keys: ["blue", "red"], name: "Purple", hex: "#7e22ce" },
+      { keys: ["red", "white"], name: "Pink", hex: "#ff70a6" },
+      { keys: ["blue", "white"], name: "Light Blue", hex: "#60a5fa" },
+      { keys: ["white", "yellow"], name: "Cream Yellow", hex: "#fef08a" },
+      { keys: ["black", "white"], name: "Gray", hex: "#9ca3af" },
+      { keys: ["blue", "red", "yellow"], name: "Brown", hex: "#78350f" },
+      { keys: ["blue", "green", "yellow"], name: "Lime Green", hex: "#84cc16" }
+    ];
+
+    const CHALLENGES = [
+      { targetName: "Orange",     hint: "Red + Yellow", hex: "#ff7b00" },
+      { targetName: "Green",      hint: "Blue + Yellow", hex: "#16a34a" },
+      { targetName: "Purple",     hint: "Red + Blue", hex: "#7e22ce" },
+      { targetName: "Pink",       hint: "Red + White", hex: "#ff70a6" },
+      { targetName: "Light Blue", hint: "Blue + White", hex: "#60a5fa" },
+      { targetName: "Gray",       hint: "Black + White", hex: "#9ca3af" },
+      { targetName: "Brown",      hint: "Red + Yellow + Blue", hex: "#78350f" }
+    ];
+
+    let mixedIngredients = [];
+    let currentColorHex = "#ef233c";
+    let currentColorName = "Red";
+    let mode = "free"; // 'free' | 'lab'
+    let currentChallengeIdx = 0;
+    let challengeSolved = false;
+
+    let toolType = "brush"; // 'brush' | 'stamp'
+    let brushSize = 14;
+    let stampChar = "⭐";
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+    let audioCtx = null;
+
+    const canvas = document.getElementById("paintCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      const container = document.getElementById("canvasContainer");
+      const temp = document.createElement("canvas");
+      temp.width = canvas.width;
+      temp.height = canvas.height;
+      temp.getContext("2d").drawImage(canvas, 0, 0);
+
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.drawImage(temp, 0, 0);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    function playTone(freq, duration = 0.2, delay = 0) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+        gain.gain.setValueAtTime(0.001, audioCtx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.16, audioCtx.currentTime + delay + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + delay);
+        osc.stop(audioCtx.currentTime + delay + duration);
+      } catch (e) {}
+    }
+
+    function speak(text) {
+      if (!("speechSynthesis" in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 0.96;
+      utter.pitch = 1.15;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function addPaint(colorKey) {
+      // Cap at 3 drops before auto-refreshing to keep toddler mixing fun and predictable
+      if (mixedIngredients.length >= 3) {
+        mixedIngredients = [];
+      }
+      mixedIngredients.push(colorKey);
+      playTone(330 + mixedIngredients.length * 90, 0.22);
+
+      const result = computeMixedColor(mixedIngredients);
+      currentColorHex = result.hex;
+      currentColorName = result.name;
+
+      // Update Bowl UI
+      const bowl = document.getElementById("mixingBowl");
+      const label = document.getElementById("bowlLabel");
+      bowl.style.backgroundColor = currentColorHex;
+      label.textContent = currentColorName;
+
+      bowl.classList.remove("swirl");
+      void bowl.offsetWidth;
+      bowl.classList.add("swirl");
+
+      // Update ingredient dots
+      const dotsEl = document.getElementById("recipeDots");
+      dotsEl.innerHTML = "";
+      mixedIngredients.forEach(k => {
+        const d = document.createElement("div");
+        d.className = "mini-dot";
+        d.style.background = BASE_COLORS[k].hex;
+        dotsEl.appendChild(d);
+      });
+
+      // Speak result
+      if (mixedIngredients.length === 1) {
+        speak(result.name);
+      } else {
+        const names = mixedIngredients.map(k => BASE_COLORS[k].name).join(" and ");
+        speak(`${names} make ${result.name}!`);
+      }
+
+      // Check Color Lab Challenge
+      if (mode === "lab" && !challengeSolved) {
+        const target = CHALLENGES[currentChallengeIdx];
+        if (result.name === target.targetName) {
+          challengeSolved = true;
+          playTone(523.25, 0.18, 0);
+          playTone(659.25, 0.18, 0.14);
+          playTone(783.99, 0.35, 0.28);
+          showToast(`You made ${target.targetName}! 🎉`, "Now paint with your new color!");
+          setTimeout(() => {
+            speak(`Hooray! You made ${target.targetName}!`);
+          }, 900);
+        }
+      }
+    }
+
+    function computeMixedColor(ingredients) {
+      const uniqueSorted = [...new Set(ingredients)].sort();
+      const exact = RECIPES.find(r =>
+        r.keys.length === uniqueSorted.length &&
+        r.keys.every((val, idx) => val === uniqueSorted[idx])
+      );
+
+      if (exact) return exact;
+
+      // Fallback RGB average for unusual 3-color blends
+      let r = 0, g = 0, b = 0;
+      ingredients.forEach(k => {
+        r += BASE_COLORS[k].rgb[0];
+        g += BASE_COLORS[k].rgb[1];
+        b += BASE_COLORS[k].rgb[2];
+      });
+      const n = ingredients.length;
+      r = Math.round(r / n);
+      g = Math.round(g / n);
+      b = Math.round(b / n);
+      return { name: "Muddy Brown", hex: `rgb(${r}, ${g}, ${b})` };
+    }
+
+    function rinseBrush() {
+      mixedIngredients = [];
+      currentColorHex = "#ef233c";
+      currentColorName = "Red";
+      const bowl = document.getElementById("mixingBowl");
+      bowl.style.backgroundColor = "#f1f3f5";
+      document.getElementById("bowlLabel").textContent = "Clean Bowl";
+      document.getElementById("recipeDots").innerHTML = "";
+      playTone(587.33, 0.15, 0);
+      playTone(440.00, 0.2, 0.12);
+      speak("Splash! Brush is clean!");
+    }
+
+    function setMode(newMode) {
+      mode = newMode;
+      document.getElementById("btnFree").classList.toggle("active", mode === "free");
+      document.getElementById("btnLab").classList.toggle("active", mode === "lab");
+      document.getElementById("challengeBanner").classList.toggle("visible", mode === "lab");
+
+      if (mode === "lab") {
+        loadChallenge(currentChallengeIdx);
+      }
+    }
+
+    function loadChallenge(idx) {
+      challengeSolved = false;
+      rinseBrush();
+      const ch = CHALLENGES[idx % CHALLENGES.length];
+      document.getElementById("targetSwatch").style.background = ch.hex;
+      document.getElementById("challengeText").textContent = `Can you mix ${ch.targetName}?`;
+      speak(`Can you mix ${ch.targetName}?`);
+    }
+
+    function nextChallenge() {
+      currentChallengeIdx = (currentChallengeIdx + 1) % CHALLENGES.length;
+      loadChallenge(currentChallengeIdx);
+    }
+
+    function showToast(title, sub) {
+      const t = document.getElementById("toast");
+      document.getElementById("toastTitle").textContent = title;
+      document.getElementById("toastSub").textContent = sub;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2600);
+    }
+
+    function setTool(type, val, btnEl) {
+      toolType = type;
+      if (type === "brush") brushSize = val;
+      if (type === "stamp") stampChar = val;
+
+      document.querySelectorAll(".brush-btn").forEach(b => b.classList.remove("active"));
+      btnEl.classList.add("active");
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      playTone(300, 0.2);
+    }
+
+    function savePainting() {
+      // Composite white background so saved PNG isn't transparent
+      const out = document.createElement("canvas");
+      out.width = canvas.width;
+      out.height = canvas.height;
+      const octx = out.getContext("2d");
+      octx.fillStyle = "#ffffff";
+      octx.fillRect(0, 0, out.width, out.height);
+      octx.drawImage(canvas, 0, 0);
+
+      const link = document.createElement("a");
+      link.download = `painting-${Date.now()}.png`;
+      link.href = out.toDataURL("image/png");
+      link.click();
+      showToast("Saved! 📸", "Your painting was downloaded.");
+    }
+
+    // Touch / Pointer Drawing
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    canvas.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      if (mixedIngredients.length === 0) {
+        addPaint("red"); // Auto-dip red if bowl was empty so toddler always paints immediately
+      }
+      const pos = getPos(e);
+
+      if (toolType === "stamp") {
+        ctx.font = "54px serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(stampChar, pos.x, pos.y);
+        playTone(523.25, 0.15);
+        return;
+      }
+
+      isDrawing = true;
+      lastX = pos.x;
+      lastY = pos.y;
+
+      // Paint dot on single tap
+      ctx.fillStyle = currentColorHex;
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, brushSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    canvas.addEventListener("pointermove", (e) => {
+      if (!isDrawing || toolType !== "brush") return;
+      e.preventDefault();
+      const pos = getPos(e);
+
+      ctx.strokeStyle = currentColorHex;
+      ctx.lineWidth = brushSize;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+
+      lastX = pos.x;
+      lastY = pos.y;
+    }, { passive: false });
+
+    window.addEventListener("pointerup", () => {
+      isDrawing = false;
+    });
+
+    // Initialize
+    resizeCanvas();
+    addPaint("red");
+  </script>
+</body>
+</html>
