@@ -1443,13 +1443,90 @@
       } catch (e) {}
     }
 
-    function speak(text) {
+    let currentVoiceSource = null;
+    let voiceAudioEl = null;
+    const voiceBufferCache = new Map();
+    const voiceBufferPending = new Map();
+
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      return audioCtx;
+    }
+
+    function slugifyColor(name) {
+      return String(name || "").toLowerCase().trim().replace(/\s+/g, "_");
+    }
+
+    function colorClipKey(name) {
+      return `color_${slugifyColor(name)}`;
+    }
+
+    const MIX_CLIP_NAMES = new Set(["orange", "green", "purple", "pink", "light_blue", "cream_yellow", "gray", "brown"]);
+
+    function preloadVoiceClip(clipKey) {
+      if (!clipKey || voiceBufferCache.has(clipKey) || voiceBufferPending.has(clipKey)) return;
+      const promise = fetch(`audio/${clipKey}.mp3`)
+        .then(res => res.ok ? res.arrayBuffer() : null)
+        .then(buf => buf ? getAudioCtx().decodeAudioData(buf.slice(0)) : null)
+        .then(decoded => {
+          if (decoded) voiceBufferCache.set(clipKey, decoded);
+          voiceBufferPending.delete(clipKey);
+          return decoded;
+        })
+        .catch(() => {
+          voiceBufferPending.delete(clipKey);
+          return null;
+        });
+      voiceBufferPending.set(clipKey, promise);
+    }
+
+    function speakFallback(text) {
       if (!("speechSynthesis" in window)) return;
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(text);
       utter.rate = 0.96;
       utter.pitch = 1.15;
       window.speechSynthesis.speak(utter);
+    }
+
+    function stopCurrentVoice() {
+      if (currentVoiceSource) {
+        try { currentVoiceSource.stop(); } catch (e) {}
+        currentVoiceSource = null;
+      }
+      if (voiceAudioEl) {
+        try { voiceAudioEl.pause(); voiceAudioEl.currentTime = 0; } catch (e) {}
+      }
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    }
+
+    function speak(text, clipKey) {
+      stopCurrentVoice();
+      if (!clipKey) {
+        speakFallback(text);
+        return;
+      }
+      if (voiceBufferCache.has(clipKey)) {
+        try {
+          const ctx = getAudioCtx();
+          const src = ctx.createBufferSource();
+          src.buffer = voiceBufferCache.get(clipKey);
+          src.connect(ctx.destination);
+          src.start(0);
+          currentVoiceSource = src;
+          return;
+        } catch (e) {}
+      }
+      preloadVoiceClip(clipKey);
+      try {
+        if (!voiceAudioEl) voiceAudioEl = new Audio();
+        voiceAudioEl.src = `audio/${clipKey}.mp3`;
+        const p = voiceAudioEl.play();
+        if (p && typeof p.catch === "function") p.catch(() => speakFallback(text));
+      } catch (e) {
+        speakFallback(text);
+      }
     }
 
     // Build Watercolour Pans
@@ -1482,7 +1559,7 @@
         el.classList.toggle("selected", el.dataset.key === pan.key);
       });
       playTone(pan.isWater ? 580 : 440, 0.16);
-      speak(pan.isWater ? "Clean water" : pan.name);
+      speak(pan.isWater ? "Clean water" : pan.name, pan.isWater ? "clean_water" : colorClipKey(pan.name));
       updateWatercolorPreview();
     }
 
@@ -1555,11 +1632,14 @@
       });
 
       // Speak result
+      const resultSlug = slugifyColor(result.name);
       if (mixedIngredients.length === 1) {
-        speak(result.name);
-      } else {
+        speak(result.name, colorClipKey(result.name));
+      } else if (MIX_CLIP_NAMES.has(resultSlug)) {
         const names = mixedIngredients.map(k => BASE_COLORS[k].name).join(" and ");
-        speak(`${names} make ${result.name}!`);
+        speak(`${names} make ${result.name}!`, `mix_${resultSlug}`);
+      } else {
+        speak(result.name, colorClipKey(result.name));
       }
 
       // Check Color Lab Challenge
@@ -1580,7 +1660,7 @@
           playTone(783.99, 0.35, 0.28);
           showToast(`You made ${target.targetName}! 🎉`, "Try painting on the right or tap Next Challenge!");
           setTimeout(() => {
-            speak(`Hooray! You made ${target.targetName}!`);
+            speak(`Hooray! You made ${target.targetName}!`, `win_${slugifyColor(target.targetName)}`);
           }, 900);
         }
       }
@@ -1620,7 +1700,7 @@
       if (!silent) {
         playTone(587.33, 0.15, 0);
         playTone(440.00, 0.2, 0.12);
-        speak("Splash! Brush is clean!");
+        speak("Splash! Brush is clean!", "brush_clean");
       }
     }
 
@@ -1639,7 +1719,7 @@
         loadChallenge(currentChallengeIdx);
       } else if (mode === "water") {
         playTone(520, 0.16);
-        speak("Watercolour mode! Paint colors on top of each other to see them mix!");
+        speak("Watercolour mode! Paint colors on top of each other to see them mix!", "watercolor_mode");
       }
 
       // Resize canvas after layout transition settles
@@ -1672,7 +1752,7 @@
       document.getElementById("labNextCta").classList.remove("visible");
 
       updateLabScore();
-      speak(`Can you mix ${ch.targetName}?`);
+      speak(`Can you mix ${ch.targetName}?`, `chal_${slugifyColor(ch.targetName)}`);
     }
 
     function toggleHint() {
@@ -1681,7 +1761,7 @@
       hintEl.classList.toggle("visible");
       if (hintEl.classList.contains("visible")) {
         playTone(620, 0.15);
-        speak(`Try mixing ${ch.hint}!`);
+        speak(`Try mixing ${ch.hint}!`, `hint_${slugifyColor(ch.targetName)}`);
       }
     }
 
